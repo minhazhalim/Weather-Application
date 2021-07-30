@@ -21,6 +21,7 @@ input {
      font-size: 1rem;
      padding: 1rem;
      min-width: 300px;
+     text-transform: capitalize;
 }
 input:focus {
      outline: none;
