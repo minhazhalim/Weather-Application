@@ -1,2 +1,2 @@
 # Weather-Application
-A Very Simple Weather Application Made With HTML,CSS and JavaScript
+A Nice and elegant Weather Application Made With HTML,CSS and JavaScript
