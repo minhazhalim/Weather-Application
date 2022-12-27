@@ -16,9 +16,9 @@ function getIconUrl(iconCode){
 }
 function renderCurrentWeather(current){
      currentIcon.src = getIconUrl(current.iconCode);
-     setValue('current-temperature',current.currentTemperature);
-     setValue('current-high',current.highTemperature);
-     setValue('current-low',current.lowTemperature);
+     setValue('current-temp',current.currentTemp);
+     setValue('current-high',current.highTemp);
+     setValue('current-low',current.lowTemp);
      setValue('current-fl-high',current.highFeelsLike);
      setValue('current-fl-low',current.lowFeelsLike);
      setValue('current-wind',current.windSpeed);
@@ -27,8 +27,8 @@ function renderCurrentWeather(current){
 function renderDailyWeather(daily){
      dailySection.innerHTML = "";
      daily.forEach(day => {
-          const element = dayCardTemplate.content.closeNode(true);
-          setValue('temperature',day.maxTemp,{parent: element});
+          const element = dayCardTemplate.content.cloneNode(true);
+          setValue('temp',day.maxTemp,{parent: element});
           setValue('date',day_formatter.format(day.timestamp),{parent: element});
           element.querySelector('[data-icon]').src = getIconUrl(day.iconCode);
           dailySection.append(element);
@@ -38,8 +38,8 @@ function renderHourlyWeather(hourly){
      hourlySection.innerHTML = "";
      hourly.forEach(hour => {
           const element = hourRowTemplate.content.cloneNode(true);
-          setValue('temperature',hour.temperature,{parent: element});
-          setValue('fl-temperature',hour.feelsLike,{parent: element});
+          setValue('temp',hour.temp,{parent: element});
+          setValue('fl-temp',hour.feelsLike,{parent: element});
           setValue('wind',hour.windSpeed,{parent: element});
           setValue('precip',hour.precip,{parent: element});
           setValue('day',day_formatter.format(hour.timestamp),{parent: element});
