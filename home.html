@@ -2,66 +2,16 @@
 <html lang="en">
 <head>
      <meta charset="UTF-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
      <meta name="viewport" content="width=device-width,initial-scale=1.0">
      <title>Weather Application</title>
      <link rel="stylesheet" href="designing.css">
      <script src="software.js" defer></script>
 </head>
 <body>
-     <h1>weather dashboard</h1>
-     <div class="container">
-          <div class="weather-input">
-               <h3>enter a city name</h3>
-               <input type="text" class="city-input" placeholder="e.g.,new york,london,tokyo">
-               <button class="search-button">search</button>
-               <div class="seperator"></div>
-               <button class="location-button">use current location</button>
-          </div>
-          <div class="weather-data">
-               <div class="current-weather">
-                    <div class="details">
-                         <h2>______ ( _____ )</h2>
-                         <h6>temperature: ___ °</h6>
-                         <h6>wind: __ m/s</h6>
-                         <h6>humidity: __%</h6>
-                    </div>
-               </div>
-               <div class="days-forecast">
-                    <h2>5-day forecast</h2>
-                    <ul class="weather-cards">
-                         <li class="card">
-                              <h3>( _____ )</h3>
-                              <h6>temperature: ___c</h6>
-                              <h6>wind: ___m/s</h6>
-                              <h6>humidity: ___%</h6>
-                         </li>
-                         <li class="card">
-                              <h3>( _____ )</h3>
-                              <h6>temperature: ___c</h6>
-                              <h6>wind: ___m/s</h6>
-                              <h6>humidity: ___%</h6>
-                         </li>
-                         <li class="card">
-                              <h3>( _____ )</h3>
-                              <h6>temperature: ___c</h6>
-                              <h6>wind: ___m/s</h6>
-                              <h6>humidity: ___%</h6>
-                         </li>
-                         <li class="card">
-                              <h3>( _____ )</h3>
-                              <h6>temperature: ___c</h6>
-                              <h6>wind: ___m/s</h6>
-                              <h6>humidity: ___%</h6>
-                         </li>
-                         <li class="card">
-                              <h3>( _____ )</h3>
-                              <h6>temperature: ___c</h6>
-                              <h6>wind: ___m/s</h6>
-                              <h6>humidity: ___%</h6>
-                         </li>
-                    </ul>
-               </div>
-          </div>
-     </div>
+     <form id="form">
+          <input type="text" id="search" placeholder="search by location" autocomplete="off">
+     </form>
+     <main id="main"></main>
 </body>
 </html>

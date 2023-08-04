@@ -1,78 +1,65 @@
-const wrapper = document.querySelector(".wrapper"),
-inputPart = document.querySelector(".input-part"),
-infoTxt = inputPart.querySelector(".info-txt"),
-inputField = inputPart.querySelector("input"),
-locationBtn = inputPart.querySelector("button"),
-weatherPart = wrapper.querySelector(".weather-part"),
-wIcon = weatherPart.querySelector("img"),
-arrowBack = wrapper.querySelector("header i");
-let api;
-function weatherDetails(info){
-    if(info.cod == "404"){
-        infoTxt.classList.replace("pending", "error");
-        infoTxt.innerText = `${inputField.value} isn't a valid city name`;
-    }else{
-        const city = info.name;
-        const country = info.sys.country;
-        const {description,id} = info.weather[0];
-        const {temp,feels_like,humidity} = info.main;
-        if(id == 800){
-            wIcon.src = "icons/clear.svg";
-        }else if(id >= 200 && id <= 232){
-            wIcon.src = "icons/storm.svg";  
-        }else if(id >= 600 && id <= 622){
-            wIcon.src = "icons/snow.svg";
-        }else if(id >= 701 && id <= 781){
-            wIcon.src = "icons/haze.svg";
-        }else if(id >= 801 && id <= 804){
-            wIcon.src = "icons/cloud.svg";
-        }else if((id >= 500 && id <= 531) || (id >= 300 && id <= 321)){
-            wIcon.src = "icons/rain.svg";
-        }
-        weatherPart.querySelector(".temp .numb").innerText = Math.floor(temp);
-        weatherPart.querySelector(".weather").innerText = description;
-        weatherPart.querySelector(".location span").innerText = `${city}, ${country}`;
-        weatherPart.querySelector(".temp .numb-2").innerText = Math.floor(feels_like);
-        weatherPart.querySelector(".humidity span").innerText = `${humidity}%`;
-        infoTxt.classList.remove("pending", "error");
-        infoTxt.innerText = "";
-        inputField.value = "";
-        wrapper.classList.add("active");
-    }
+import './design.css';
+import {getWeather} from './weather.js';
+import {icon_map} from './iconMap.js';
+const currentIcon = document.querySelector('[data-current-icon]');
+const dailySection = document.querySelector('[data-day-section]');
+const hourlySection = document.querySelector('[data-hour-section]');
+const dayCardTemplate = document.getElementById('day-card-template');
+const hourRowTemplate = document.getElementById('hour-row-template');
+const day_formatter = new Intl.DateTimeFormat(undefined,{weekday: 'long'});
+const hour_formatter = new Intl.DateTimeFormat(undefined,{hour: 'numeric'});
+function setValue(selector,value,{parent = document} = {}){
+     parent.querySelector(`[data-${selector}]`).textContent = value;
 }
-function fetchData(){
-    infoTxt.innerText = "Getting weather details...";
-    infoTxt.classList.add("pending");
-    fetch(api).then(res => res.json()).then(result => weatherDetails(result)).catch(() => {
-        infoTxt.innerText = "Something went wrong";
-        infoTxt.classList.replace("pending", "error");
-    });
+function getIconUrl(iconCode){
+     return `./icons/${icon_map.get(iconCode)}.svg`;
 }
-function requestApi(city){
-    api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=your_api_key`;
-    fetchData();
+function renderCurrentWeather(current){
+     currentIcon.src = getIconUrl(current.iconCode);
+     setValue('current-temp',current.currentTemp);
+     setValue('current-high',current.highTemp);
+     setValue('current-low',current.lowTemp);
+     setValue('current-fl-high',current.highFeelsLike);
+     setValue('current-fl-low',current.lowFeelsLike);
+     setValue('current-wind',current.windSpeed);
+     setValue('current-precip',current.precip);
 }
-function onSuccess(position){
-    const {latitude,longitude} = position.coords;
-    api = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=your_api_key`;
-    fetchData();
+function renderDailyWeather(daily){
+     dailySection.innerHTML = "";
+     daily.forEach(day => {
+          const element = dayCardTemplate.content.cloneNode(true);
+          setValue('temp',day.maxTemp,{parent: element});
+          setValue('date',day_formatter.format(day.timestamp),{parent: element});
+          element.querySelector('[data-icon]').src = getIconUrl(day.iconCode);
+          dailySection.append(element);
+     });
 }
-function onError(error){
-    infoTxt.innerText = error.message;
-    infoTxt.classList.add("error");
+function renderHourlyWeather(hourly){
+     hourlySection.innerHTML = "";
+     hourly.forEach(hour => {
+          const element = hourRowTemplate.content.cloneNode(true);
+          setValue('temp',hour.temp,{parent: element});
+          setValue('fl-temp',hour.feelsLike,{parent: element});
+          setValue('wind',hour.windSpeed,{parent: element});
+          setValue('precip',hour.precip,{parent: element});
+          setValue('day',day_formatter.format(hour.timestamp),{parent: element});
+          setValue('time',hour_formatter.format(hour.timestamp),{parent: element});
+          element.querySelector('[data-icon]').src = getIconUrl(hour.iconCode);
+          hourlySection.append(element);
+     });
 }
-inputField.addEventListener("keyup",event => {
-    if(event.key == "Enter" && inputField.value != ""){
-        requestApi(inputField.value);
-    }
-});
-locationBtn.addEventListener("click", () => {
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(onSuccess,onError);
-    }else{
-        alert("Your browser not support geolocation api");
-    }
-});
-arrowBack.addEventListener("click",() => {
-    wrapper.classList.remove("active");
-});
+function renderWeather({current,daily,hourly}){
+     renderCurrentWeather(current);
+     renderDailyWeather(daily);
+     renderHourlyWeather(hourly);
+     document.body.classList.remove('blurred');
+}
+function positionSuccess({coords}){
+     getWeather(coords.latitude,coords.longitude,Intl.DateTimeFormat().resolvedOptions().timeZone).then(renderWeather).catch(error => {
+          alert('Error Getting Weather',error);
+     });
+}
+function positionError(){
+     alert('There was an Error Getting Your Location. Please Allow Us to Use Your Location and Refresh the Page.')
+}
+navigator.geolocation.getCurrentPosition(positionSuccess,positionError);
